@@ -3,10 +3,15 @@ from flask import Flask, render_template, request, send_file, jsonify
 import joblib
 import os
 import io
+from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
 model = joblib.load('machine_failure_model.pkl')
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # ---- Input validation ranges (based on AI4I 2020 dataset) ----
 VALID_RANGES = {
@@ -56,6 +61,42 @@ def classify_risk(probability: float) -> str:
     return "High Risk 🔴"
 
 
+def generate_explanation(values: dict, prediction: str,
+                         probability: float, risk_level: str) -> str:
+    """Call Groq LLM to explain the prediction in plain English."""
+    prompt = f"""
+You are an industrial maintenance expert AI assistant.
+
+A machine has been assessed with the following sensor readings:
+- Air temperature: {values['air_temp']} K
+- Process temperature: {values['process_temp']} K
+- Rotational speed: {values['rot_speed']} rpm
+- Torque: {values['torque']} Nm
+- Tool wear: {values['tool_wear']} min
+
+The predictive model returned:
+- Prediction: {prediction}
+- Failure probability: {probability:.0%}
+- Risk level: {risk_level}
+
+In 3-4 sentences, explain to a plant engineer:
+1. What is likely going wrong
+2. Which sensor readings are most concerning and why
+3. What action they should take
+
+Be specific, practical and concise. No jargon beyond standard engineering terms.
+"""
+    try:
+        response = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=200,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception:
+        return "AI explanation unavailable at this time."
+
+
 # ---------------- HOME ----------------
 @app.route('/')
 def home():
@@ -64,6 +105,7 @@ def home():
         probability=None,
         prediction=None,
         risk=None,
+        explanation=None,
         error=None,
     )
 
@@ -82,9 +124,8 @@ def predict_form():
     except (ValueError, KeyError) as e:
         return render_template(
             "index.html",
-            prediction=None,
-            probability=None,
-            risk=None,
+            prediction=None, probability=None,
+            risk=None, explanation=None,
             error=f"Invalid input: {e}",
         )
 
@@ -92,23 +133,24 @@ def predict_form():
     if errors:
         return render_template(
             "index.html",
-            prediction=None,
-            probability=None,
-            risk=None,
+            prediction=None, probability=None,
+            risk=None, explanation=None,
             error=" | ".join(errors),
         )
 
-    features = pd.DataFrame([{COLUMN_MAP[k]: v for k, v in values.items()}])
-    prediction = model.predict(features)[0]
+    features    = pd.DataFrame([{COLUMN_MAP[k]: v for k, v in values.items()}])
+    prediction  = model.predict(features)[0]
     probability = float(model.predict_proba(features)[0][1])
-
-    result = "Failure Likely ⚠️" if prediction == 1 else "Machine Healthy ✅"
+    risk        = classify_risk(probability)
+    result      = "Failure Likely ⚠️" if prediction == 1 else "Machine Healthy ✅"
+    explanation = generate_explanation(values, result, probability, risk)
 
     return render_template(
         "index.html",
         prediction=result,
         probability=round(probability, 2),
-        risk=classify_risk(probability),
+        risk=risk,
+        explanation=explanation,
         error=None,
     )
 
@@ -133,7 +175,6 @@ def predict_batch():
     else:
         return "Unsupported file type. Please upload a .csv or .xlsx file.", 400
 
-    # Accept both short column names (from template) and full names
     df = df.rename(columns=COLUMN_MAP)
 
     missing = [col for col in FEATURE_COLUMNS if col not in df.columns]
@@ -143,8 +184,8 @@ def predict_batch():
             "Download the template to see the expected format."
         ), 400
 
-    features = df[FEATURE_COLUMNS]
-    predictions = model.predict(features)
+    features      = df[FEATURE_COLUMNS]
+    predictions   = model.predict(features)
     probabilities = model.predict_proba(features)[:, 1]
 
     df['Prediction'] = ['Failure Likely' if p == 1 else 'Machine Healthy'
@@ -172,7 +213,7 @@ def predict_batch():
 def download_template():
     df = pd.DataFrame(
         [[300.0, 310.0, 1500.0, 40.0, 5.0]],
-        columns=list(COLUMN_MAP.keys()),  # short names users fill in
+        columns=list(COLUMN_MAP.keys()),
     )
 
     output = io.BytesIO()
@@ -212,17 +253,21 @@ def api_predict():
     if errors:
         return jsonify({"error": errors}), 422
 
-    features = pd.DataFrame([{COLUMN_MAP[k]: v for k, v in values.items()}])
-    prediction = int(model.predict(features)[0])
+    features    = pd.DataFrame([{COLUMN_MAP[k]: v for k, v in values.items()}])
+    prediction  = int(model.predict(features)[0])
     probability = float(model.predict_proba(features)[0][1])
 
-    risk_map = {0: "Low", 1: "Medium", 2: "High"}
-    risk_index = 0 if probability < 0.3 else 1 if probability < 0.6 else 2
+    risk_map    = {0: "Low", 1: "Medium", 2: "High"}
+    risk_index  = 0 if probability < 0.3 else 1 if probability < 0.6 else 2
+    risk_level  = risk_map[risk_index]
+    pred_label  = "Failure Likely" if prediction == 1 else "Machine Healthy"
+    explanation = generate_explanation(values, pred_label, probability, risk_level)
 
     return jsonify({
-        "prediction": "Failure Likely" if prediction == 1 else "Machine Healthy",
+        "prediction":          pred_label,
         "failure_probability": round(probability, 4),
-        "risk_level": risk_map[risk_index],
+        "risk_level":          risk_level,
+        "explanation":         explanation,
     })
 
 
