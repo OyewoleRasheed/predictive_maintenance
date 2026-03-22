@@ -10,108 +10,55 @@
     body {
       background: #0f1923;
       min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
       font-family: 'Segoe UI', system-ui, sans-serif;
       padding: 2rem 1rem;
       color: #e2e8f0;
     }
 
-    .pm-wrap {
-      width: 100%;
-      max-width: 640px;
-    }
+    .pm-wrap { width: 100%; max-width: 900px; margin: 0 auto; }
 
-    .pm-header {
-      margin-bottom: 1.5rem;
-    }
+    .pm-header { margin-bottom: 1.5rem; }
 
     .pm-header h1 {
-      font-size: 20px;
-      font-weight: 500;
-      color: #f1f5f9;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
+      font-size: 20px; font-weight: 500; color: #f1f5f9;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
     }
 
     .pm-icon {
-      width: 32px;
-      height: 32px;
-      background: rgba(59, 130, 246, 0.15);
+      width: 32px; height: 32px;
+      background: rgba(59,130,246,0.15);
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
     .pm-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: #60a5fa;
-      fill: none;
-      stroke-width: 1.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 16px; height: 16px; stroke: #60a5fa; fill: none;
+      stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .pm-header p {
-      font-size: 13px;
-      color: #64748b;
-      padding-left: 42px;
-    }
+    .pm-header p { font-size: 13px; color: #64748b; padding-left: 42px; }
 
     .section-card {
       background: #1a2332;
       border: 0.5px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 1rem;
+      border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;
     }
 
     .section-title {
-      font-size: 11px;
-      font-weight: 500;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 1rem;
+      font-size: 11px; font-weight: 500; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem;
     }
 
-    .field-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .field-grid.full { grid-template-columns: 1fr; }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .field label {
-      font-size: 12px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; color: #94a3b8; font-weight: 500; }
 
     .field input[type="number"] {
-      height: 36px;
-      border: 0.5px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 0 10px;
-      font-size: 14px;
-      color: #f1f5f9;
-      background: #0f1923;
-      width: 100%;
-      outline: none;
+      height: 36px; border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 0 10px; font-size: 14px;
+      color: #f1f5f9; background: #0f1923; width: 100%; outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
@@ -125,131 +72,86 @@
       box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
     }
 
-    .range-hint {
-      font-size: 11px;
-      color: #475569;
-      transition: color 0.15s;
-    }
-
+    .range-hint { font-size: 11px; color: #475569; transition: color 0.15s; }
     .range-hint.warn { color: #f87171; }
 
     .predict-btn {
-      width: 100%;
-      height: 40px;
-      background: rgba(59, 130, 246, 0.12);
-      border: 0.5px solid rgba(59, 130, 246, 0.3);
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #93c5fd;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-      margin-top: 4px;
+      width: 100%; height: 40px;
+      background: rgba(59,130,246,0.12);
+      border: 0.5px solid rgba(59,130,246,0.3);
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: #93c5fd; cursor: pointer;
+      transition: background 0.15s, transform 0.1s; margin-top: 4px;
     }
 
-    .predict-btn:hover { background: rgba(59, 130, 246, 0.2); }
+    .predict-btn:hover { background: rgba(59,130,246,0.2); }
     .predict-btn:active { transform: scale(0.98); }
 
     .result-box {
-      display: none;
-      margin-top: 1rem;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 0.5px solid rgba(255,255,255,0.08);
+      display: none; margin-top: 1rem; padding: 1rem;
+      border-radius: 8px; border: 0.5px solid rgba(255,255,255,0.08);
       background: #0f1923;
     }
 
     .result-box.show { display: block; }
 
     .result-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
     }
 
-    .result-label {
-      font-size: 15px;
-      font-weight: 500;
-      color: #f1f5f9;
-    }
+    .result-label { font-size: 15px; font-weight: 500; color: #f1f5f9; }
 
-    .risk-badge {
-      font-size: 12px;
-      font-weight: 500;
-      padding: 3px 10px;
-      border-radius: 100px;
-    }
-
+    .risk-badge { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 100px; }
     .risk-low  { background: rgba(34,197,94,0.15);  color: #4ade80; }
     .risk-med  { background: rgba(234,179,8,0.15);  color: #facc15; }
     .risk-high { background: rgba(239,68,68,0.15);  color: #f87171; }
 
-    .prob-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .prob-row { display: flex; align-items: center; gap: 10px; }
 
     .prob-track {
-      flex: 1;
-      height: 5px;
+      flex: 1; height: 5px;
       background: rgba(255,255,255,0.07);
-      border-radius: 3px;
-      overflow: hidden;
+      border-radius: 3px; overflow: hidden;
     }
 
-    .prob-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-
+    .prob-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
     .fill-low  { background: #22c55e; }
     .fill-med  { background: #eab308; }
     .fill-high { background: #ef4444; }
 
-    .prob-val {
-      font-size: 13px;
-      font-weight: 500;
-      color: #94a3b8;
-      min-width: 38px;
-      text-align: right;
+    .prob-val { font-size: 13px; font-weight: 500; color: #94a3b8; min-width: 38px; text-align: right; }
+
+    .explanation-box {
+      display: none; margin-top: 12px; padding: 12px;
+      background: rgba(255,255,255,0.04); border-radius: 8px;
+      border: 0.5px solid rgba(255,255,255,0.08);
     }
 
+    .explanation-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #475569; margin-bottom: 6px; font-weight: 500;
+    }
+
+    .explanation-text { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
     .error-msg {
-      display: none;
-      font-size: 12px;
-      color: #f87171;
-      margin-top: 8px;
-      padding: 8px 10px;
-      background: rgba(239,68,68,0.08);
-      border-radius: 8px;
-      border: 0.5px solid rgba(239,68,68,0.2);
+      display: none; font-size: 12px; color: #f87171; margin-top: 8px;
+      padding: 8px 10px; background: rgba(239,68,68,0.08);
+      border-radius: 8px; border: 0.5px solid rgba(239,68,68,0.2);
     }
 
     .error-msg.show { display: block; }
 
-    .batch-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .batch-row { display: flex; align-items: center; gap: 10px; }
 
     .file-label {
-      flex: 1;
-      height: 36px;
+      flex: 1; height: 36px;
       border: 0.5px dashed rgba(255,255,255,0.15);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      font-size: 13px;
-      color: #475569;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      gap: 8px;
-      overflow: hidden;
+      border-radius: 8px; display: flex; align-items: center;
+      padding: 0 12px; font-size: 13px; color: #475569;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+      gap: 8px; overflow: hidden;
     }
 
     .file-label:hover {
@@ -258,47 +160,94 @@
     }
 
     #batch-file { display: none; }
-
-    #file-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: #64748b;
-    }
-
+    #file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; }
     #file-name.selected { color: #94a3b8; }
 
     .upload-btn {
-      height: 36px;
-      padding: 0 16px;
+      height: 36px; padding: 0 16px;
       background: rgba(255,255,255,0.04);
       border: 0.5px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #94a3b8;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
+      border-radius: 8px; font-size: 13px; font-weight: 500;
+      color: #94a3b8; cursor: pointer; transition: background 0.15s; white-space: nowrap;
     }
 
     .upload-btn:hover { background: rgba(255,255,255,0.08); }
     .upload-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .template-link {
-      font-size: 12px;
-      color: #60a5fa;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      margin-top: 8px;
-      display: inline-block;
+      font-size: 12px; color: #60a5fa; cursor: pointer;
+      background: none; border: none; padding: 0;
+      text-decoration: underline; text-underline-offset: 2px;
+      margin-top: 8px; display: inline-block;
     }
 
     .template-link:hover { opacity: 0.75; }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; margin-bottom: 1rem;
+    }
+
+    .summary-card {
+      background: #0f1923; border: 0.5px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 12px; text-align: center;
+    }
+
+    .summary-card .s-label { font-size: 11px; color: #475569; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-card .s-val  { font-size: 22px; font-weight: 500; color: #f1f5f9; }
+    .summary-card.high .s-val { color: #f87171; }
+    .summary-card.med  .s-val { color: #facc15; }
+    .summary-card.low  .s-val { color: #4ade80; }
+
+    /* Batch results table */
+    .batch-results { display: none; margin-top: 1rem; }
+    .batch-results.show { display: block; }
+
+    .batch-table-wrap { overflow-x: auto; border-radius: 8px; border: 0.5px solid rgba(255,255,255,0.08); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
+    th {
+      background: #0f1923; padding: 8px 12px; text-align: left;
+      font-size: 11px; color: #475569; text-transform: uppercase;
+      letter-spacing: 0.05em; font-weight: 500;
+      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px 12px; color: #94a3b8;
+      border-bottom: 0.5px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 100px; }
+
+    .explanation-cell {
+      font-size: 12px; color: #64748b; line-height: 1.5;
+      max-width: 300px; font-style: italic;
+    }
+
+    .download-csv-btn {
+      margin-top: 12px; height: 36px; padding: 0 16px;
+      background: rgba(34,197,94,0.1);
+      border: 0.5px solid rgba(34,197,94,0.3);
+      border-radius: 8px; font-size: 13px; font-weight: 500;
+      color: #4ade80; cursor: pointer; transition: background 0.15s;
+    }
+
+    .download-csv-btn:hover { background: rgba(34,197,94,0.2); }
+
+    .loading-msg {
+      display: none; font-size: 13px; color: #64748b;
+      margin-top: 10px; font-style: italic;
+    }
+
+    .loading-msg.show { display: block; }
   </style>
 </head>
 <body>
@@ -312,7 +261,7 @@
       </div>
       AI Predictive Maintenance
     </h1>
-    <p>Machine failure risk assessment · Random Forest · AI4I 2020 dataset</p>
+    <p>Machine failure risk assessment · Random Forest + LLM · AI4I 2020 dataset</p>
   </div>
 
   <!-- Single Prediction -->
@@ -365,12 +314,9 @@
         </div>
         <span class="prob-val" id="prob-val">—</span>
       </div>
-      <div id="explanation-box" style="display:none; margin-top: 12px; padding: 12px;
-           background: rgba(255,255,255,0.04); border-radius: 8px;
-           border: 0.5px solid rgba(255,255,255,0.08);">
-        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
-           color: #475569; margin-bottom: 6px; font-weight: 500;">AI Analysis</p>
-        <p id="explanation-text" style="font-size: 13px; color: #94a3b8; line-height: 1.6;"></p>
+      <div class="explanation-box" id="explanation-box">
+        <p class="explanation-label">AI Analysis</p>
+        <p class="explanation-text" id="explanation-text"></p>
       </div>
     </div>
   </div>
@@ -381,8 +327,8 @@
 
     <div class="batch-row">
       <label class="file-label" for="batch-file">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
         <span id="file-name">Choose .csv or .xlsx file…</span>
@@ -392,6 +338,41 @@
     </div>
 
     <button class="template-link" onclick="downloadTemplate()">Download Excel template</button>
+
+    <div class="loading-msg" id="batch-loading">
+      Analysing machines and generating AI explanations for high risk rows…
+    </div>
+
+    <!-- Batch Results -->
+    <div class="batch-results" id="batch-results">
+
+      <div class="summary-grid" id="summary-grid"></div>
+
+      <div class="batch-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Air temp</th>
+              <th>Proc temp</th>
+              <th>Speed</th>
+              <th>Torque</th>
+              <th>Wear</th>
+              <th>Prediction</th>
+              <th>Probability</th>
+              <th>Risk</th>
+              <th>AI Analysis</th>
+            </tr>
+          </thead>
+          <tbody id="batch-tbody"></tbody>
+        </table>
+      </div>
+
+      <button class="download-csv-btn" id="download-csv-btn" onclick="downloadCSV()">
+        Download full results as CSV
+      </button>
+
+    </div>
   </div>
 
 </div>
@@ -411,6 +392,7 @@
   };
 
   const fields = Object.keys(RANGES);
+  let batchData = null;
 
   fields.forEach(id => {
     const el   = document.getElementById(id);
@@ -446,14 +428,8 @@
     for (const id of fields) {
       const v = parseFloat(document.getElementById(id).value);
       const [lo, hi] = RANGES[id];
-      if (isNaN(v)) {
-        showError(`Please fill in "${id.replace(/_/g, ' ')}".`);
-        return;
-      }
-      if (v < lo || v > hi) {
-        showError(`"${id.replace(/_/g, ' ')}" must be between ${lo} and ${hi}.`);
-        return;
-      }
+      if (isNaN(v)) { showError(`Please fill in "${id.replace(/_/g, ' ')}".`); return; }
+      if (v < lo || v > hi) { showError(`"${id.replace(/_/g, ' ')}" must be between ${lo} and ${hi}.`); return; }
       vals[id] = v;
     }
 
@@ -492,7 +468,7 @@
     const expBox  = document.getElementById('explanation-box');
     const expText = document.getElementById('explanation-text');
     if (data.explanation) {
-      expText.textContent = data.explanation;
+      expText.textContent  = data.explanation;
       expBox.style.display = 'block';
     } else {
       expBox.style.display = 'none';
@@ -512,19 +488,99 @@
   function submitBatch() {
     const file = document.getElementById('batch-file').files[0];
     if (!file) return;
+
+    document.getElementById('batch-loading').classList.add('show');
+    document.getElementById('batch-results').classList.remove('show');
+    document.getElementById('upload-btn').disabled = true;
+
     const form = new FormData();
     form.append('file', file);
+
     fetch('/predict_batch', { method: 'POST', body: form })
-      .then(r => {
-        if (!r.ok) return r.text().then(t => alert(t));
-        return r.blob().then(b => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(b);
-          a.download = 'batch_predictions.csv';
-          a.click();
-        });
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('batch-loading').classList.remove('show');
+        document.getElementById('upload-btn').disabled = false;
+
+        if (data.error) { alert(data.error); return; }
+
+        batchData = data;
+        renderBatchResults(data);
       })
-      .catch(() => alert('Upload failed. Is the Flask server running?'));
+      .catch(() => {
+        document.getElementById('batch-loading').classList.remove('show');
+        document.getElementById('upload-btn').disabled = false;
+        alert('Upload failed. Is the Flask server running?');
+      });
+  }
+
+  function renderBatchResults(data) {
+    const { results, summary } = data;
+
+    // Summary cards
+    document.getElementById('summary-grid').innerHTML = `
+      <div class="summary-card">
+        <div class="s-label">Total</div>
+        <div class="s-val">${summary.total}</div>
+      </div>
+      <div class="summary-card high">
+        <div class="s-label">High risk</div>
+        <div class="s-val">${summary.high}</div>
+      </div>
+      <div class="summary-card med">
+        <div class="s-label">Medium risk</div>
+        <div class="s-val">${summary.medium}</div>
+      </div>
+      <div class="summary-card low">
+        <div class="s-label">Low risk</div>
+        <div class="s-val">${summary.low}</div>
+      </div>
+    `;
+
+    // Table rows
+    const tbody = document.getElementById('batch-tbody');
+    tbody.innerHTML = '';
+
+    results.forEach(r => {
+      const cls   = r.risk_level === 'High' ? 'risk-high' : r.risk_level === 'Medium' ? 'risk-med' : 'risk-low';
+      const pct   = Math.round(r.probability * 100);
+      const expHtml = r.explanation
+        ? `<span class="explanation-cell">${r.explanation}</span>`
+        : `<span style="color:#334155; font-size:11px;">—</span>`;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="color:#475569">${r.row}</td>
+        <td>${r.air_temp}</td>
+        <td>${r.process_temp}</td>
+        <td>${r.rot_speed}</td>
+        <td>${r.torque}</td>
+        <td>${r.tool_wear}</td>
+        <td style="color:#f1f5f9; font-size:12px;">${r.prediction}</td>
+        <td>${pct}%</td>
+        <td><span class="badge ${cls}">${r.risk_level}</span></td>
+        <td>${expHtml}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('batch-results').classList.add('show');
+  }
+
+  function downloadCSV() {
+    if (!batchData) return;
+    fetch('/download_batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(batchData),
+    })
+    .then(r => r.blob())
+    .then(b => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'batch_predictions.csv';
+      a.click();
+    });
   }
 
   function downloadTemplate() {

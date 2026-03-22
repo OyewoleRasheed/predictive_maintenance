@@ -11,7 +11,6 @@ load_dotenv()
 app = Flask(__name__)
 
 model = joblib.load('machine_failure_model.pkl')
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # ---- Input validation ranges (based on AI4I 2020 dataset) ----
 VALID_RANGES = {
@@ -40,7 +39,6 @@ COLUMN_MAP = {
 
 
 def validate_inputs(values: dict) -> list[str]:
-    """Return a list of validation error messages (empty = all good)."""
     errors = []
     for field, (low, high) in VALID_RANGES.items():
         val = values.get(field)
@@ -61,9 +59,16 @@ def classify_risk(probability: float) -> str:
     return "High Risk 🔴"
 
 
+def classify_risk_label(probability: float) -> str:
+    if probability < 0.3:
+        return "Low"
+    elif probability < 0.6:
+        return "Medium"
+    return "High"
+
+
 def generate_explanation(values: dict, prediction: str,
                          probability: float, risk_level: str) -> str:
-    """Call Groq LLM to explain the prediction in plain English."""
     prompt = f"""
 You are an industrial maintenance expert AI assistant.
 
@@ -87,17 +92,16 @@ In 3-4 sentences, explain to a plant engineer:
 Be specific, practical and concise. No jargon beyond standard engineering terms.
 """
     try:
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=200,
         )
         return response.choices[0].message.content.strip()
-    except Exception:
+    except Exception as e:
+        print(f"Groq error: {e}")
         return "AI explanation unavailable at this time."
-    # except Exception as e:
-    #     print(f"Groq error: {e}")
-    #     return f"Debug: {str(e)}"
 
 
 # ---------------- HOME ----------------
@@ -158,13 +162,13 @@ def predict_form():
     )
 
 
-# ---------------- BATCH PREDICTION ----------------
+# ---------------- BATCH PREDICTION — returns JSON for dashboard ----------------
 @app.route('/predict_batch', methods=['POST'])
 def predict_batch():
     file = request.files.get('file')
 
     if not file or file.filename == '':
-        return "No file uploaded.", 400
+        return jsonify({"error": "No file uploaded."}), 400
 
     extension = os.path.splitext(file.filename)[1].lower()
 
@@ -176,28 +180,84 @@ def predict_batch():
     elif extension == '.xlsx':
         df = pd.read_excel(file)
     else:
-        return "Unsupported file type. Please upload a .csv or .xlsx file.", 400
+        return jsonify({"error": "Please upload a .csv or .xlsx file."}), 400
 
     df = df.rename(columns=COLUMN_MAP)
 
     missing = [col for col in FEATURE_COLUMNS if col not in df.columns]
     if missing:
-        return (
-            f"File is missing required columns: {missing}. "
-            "Download the template to see the expected format."
-        ), 400
+        return jsonify({
+            "error": f"Missing columns: {missing}. Download the template."
+        }), 400
 
     features      = df[FEATURE_COLUMNS]
     predictions   = model.predict(features)
     probabilities = model.predict_proba(features)[:, 1]
 
-    df['Prediction'] = ['Failure Likely' if p == 1 else 'Machine Healthy'
-                        for p in predictions]
-    df['Failure_Probability'] = probabilities.round(4)
-    df['Risk_Level'] = [
-        'Low' if p < 0.3 else 'Medium' if p < 0.6 else 'High'
-        for p in probabilities
-    ]
+    results = []
+    for i, (pred, prob) in enumerate(zip(predictions, probabilities)):
+        risk_label = classify_risk_label(float(prob))
+        pred_label = "Failure Likely" if pred == 1 else "Machine Healthy"
+
+        row_values = {
+            'air_temp':     float(df.iloc[i]['Air temperature [K]']),
+            'process_temp': float(df.iloc[i]['Process temperature [K]']),
+            'rot_speed':    float(df.iloc[i]['Rotational speed [rpm]']),
+            'torque':       float(df.iloc[i]['Torque [Nm]']),
+            'tool_wear':    float(df.iloc[i]['Tool wear [min]']),
+        }
+
+        # Only call Groq for High risk rows
+        explanation = ""
+        if risk_label == "High":
+            explanation = generate_explanation(
+                row_values, pred_label, float(prob), risk_label
+            )
+
+        results.append({
+            "row":         i + 1,
+            "air_temp":    row_values['air_temp'],
+            "process_temp": row_values['process_temp'],
+            "rot_speed":   row_values['rot_speed'],
+            "torque":      row_values['torque'],
+            "tool_wear":   row_values['tool_wear'],
+            "prediction":  pred_label,
+            "probability": round(float(prob), 4),
+            "risk_level":  risk_label,
+            "explanation": explanation,
+        })
+
+    # Summary counts
+    summary = {
+        "total":  len(results),
+        "high":   sum(1 for r in results if r['risk_level'] == "High"),
+        "medium": sum(1 for r in results if r['risk_level'] == "Medium"),
+        "low":    sum(1 for r in results if r['risk_level'] == "Low"),
+    }
+
+    return jsonify({"results": results, "summary": summary})
+
+
+# ---------------- BATCH DOWNLOAD — called after results shown ----------------
+@app.route('/download_batch', methods=['POST'])
+def download_batch():
+    data = request.get_json(silent=True)
+    if not data or 'results' not in data:
+        return "No data to download.", 400
+
+    df = pd.DataFrame(data['results'])
+    df = df.rename(columns={
+        "row": "Row",
+        "air_temp": "Air temperature [K]",
+        "process_temp": "Process temperature [K]",
+        "rot_speed": "Rotational speed [rpm]",
+        "torque": "Torque [Nm]",
+        "tool_wear": "Tool wear [min]",
+        "prediction": "Prediction",
+        "probability": "Failure_Probability",
+        "risk_level": "Risk_Level",
+        "explanation": "AI_Explanation",
+    })
 
     output = io.BytesIO()
     df.to_csv(output, index=False)
@@ -260,16 +320,14 @@ def api_predict():
     prediction  = int(model.predict(features)[0])
     probability = float(model.predict_proba(features)[0][1])
 
-    risk_map    = {0: "Low", 1: "Medium", 2: "High"}
-    risk_index  = 0 if probability < 0.3 else 1 if probability < 0.6 else 2
-    risk_level  = risk_map[risk_index]
+    risk_label  = classify_risk_label(probability)
     pred_label  = "Failure Likely" if prediction == 1 else "Machine Healthy"
-    explanation = generate_explanation(values, pred_label, probability, risk_level)
+    explanation = generate_explanation(values, pred_label, probability, risk_label)
 
     return jsonify({
         "prediction":          pred_label,
         "failure_probability": round(probability, 4),
-        "risk_level":          risk_level,
+        "risk_level":          risk_label,
         "explanation":         explanation,
     })
 
