@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Predictive Maintenance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f1923;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 2rem 1rem;
+      color: #e2e8f0;
+    }
+
+    .pm-wrap {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .pm-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .pm-header h1 {
+      font-size: 20px;
+      font-weight: 500;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .pm-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(59, 130, 246, 0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .pm-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: #60a5fa;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pm-header p {
+      font-size: 13px;
+      color: #64748b;
+      padding-left: 42px;
+    }
+
+    .section-card {
+      background: #1a2332;
+      border: 0.5px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 1rem;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .field-grid.full { grid-template-columns: 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .field input[type="number"] {
+      height: 36px;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0 10px;
+      font-size: 14px;
+      color: #f1f5f9;
+      background: #0f1923;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .field input[type="number"]:focus {
+      border-color: rgba(59,130,246,0.5);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .field input.invalid {
+      border-color: rgba(239,68,68,0.6);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+    }
+
+    .range-hint {
+      font-size: 11px;
+      color: #475569;
+      transition: color 0.15s;
+    }
+
+    .range-hint.warn { color: #f87171; }
+
+    .predict-btn {
+      width: 100%;
+      height: 40px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 0.5px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #93c5fd;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .predict-btn:hover { background: rgba(59, 130, 246, 0.2); }
+    .predict-btn:active { transform: scale(0.98); }
+
+    .result-box {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 0.5px solid rgba(255,255,255,0.08);
+      background: #0f1923;
+    }
+
+    .result-box.show { display: block; }
+
+    .result-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .result-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: #f1f5f9;
+    }
+
+    .risk-badge {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .risk-low  { background: rgba(34,197,94,0.15);  color: #4ade80; }
+    .risk-med  { background: rgba(234,179,8,0.15);  color: #facc15; }
+    .risk-high { background: rgba(239,68,68,0.15);  color: #f87171; }
+
+    .prob-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .prob-track {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .prob-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .fill-low  { background: #22c55e; }
+    .fill-med  { background: #eab308; }
+    .fill-high { background: #ef4444; }
+
+    .prob-val {
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      min-width: 38px;
+      text-align: right;
+    }
+
+    .error-msg {
+      display: none;
+      font-size: 12px;
+      color: #f87171;
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: rgba(239,68,68,0.08);
+      border-radius: 8px;
+      border: 0.5px solid rgba(239,68,68,0.2);
+    }
+
+    .error-msg.show { display: block; }
+
+    .batch-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .file-label {
+      flex: 1;
+      height: 36px;
+      border: 0.5px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 13px;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .file-label:hover {
+      border-color: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.03);
+    }
+
+    #batch-file { display: none; }
+
+    #file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #64748b;
+    }
+
+    #file-name.selected { color: #94a3b8; }
+
+    .upload-btn {
+      height: 36px;
+      padding: 0 16px;
+      background: rgba(255,255,255,0.04);
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .upload-btn:hover { background: rgba(255,255,255,0.08); }
+    .upload-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .template-link {
+      font-size: 12px;
+      color: #60a5fa;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .template-link:hover { opacity: 0.75; }
+  </style>
+</head>
+<body>
+
+<div class="pm-wrap">
+
+  <div class="pm-header">
+    <h1>
+      <div class="pm-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      AI Predictive Maintenance
+    </h1>
+    <p>Machine failure risk assessment · Random Forest · AI4I 2020 dataset</p>
+  </div>
+
+  <!-- Single Prediction -->
+  <div class="section-card">
+    <div class="section-title">Single prediction</div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>Air temperature (K)</label>
+        <input type="number" id="air_temp" step="any" placeholder="300" min="290" max="305">
+        <span class="range-hint" id="hint-air_temp">290 – 305 K</span>
+      </div>
+      <div class="field">
+        <label>Process temperature (K)</label>
+        <input type="number" id="process_temp" step="any" placeholder="310" min="305" max="315">
+        <span class="range-hint" id="hint-process_temp">305 – 315 K</span>
+      </div>
+      <div class="field">
+        <label>Rotational speed (rpm)</label>
+        <input type="number" id="rot_speed" step="any" placeholder="1500" min="1168" max="2886">
+        <span class="range-hint" id="hint-rot_speed">1168 – 2886 rpm</span>
+      </div>
+      <div class="field">
+        <label>Torque (Nm)</label>
+        <input type="number" id="torque" step="any" placeholder="40" min="3.8" max="76.6">
+        <span class="range-hint" id="hint-torque">3.8 – 76.6 Nm</span>
+      </div>
+    </div>
+
+    <div class="field-grid full">
+      <div class="field">
+        <label>Tool wear (min)</label>
+        <input type="number" id="tool_wear" step="any" placeholder="108" min="0" max="253">
+        <span class="range-hint" id="hint-tool_wear">0 – 253 min</span>
+      </div>
+    </div>
+
+    <div class="error-msg" id="form-error"></div>
+
+    <button class="predict-btn" onclick="submitPrediction()">Predict failure risk</button>
+
+    <div class="result-box" id="result-box">
+      <div class="result-top">
+        <span class="result-label" id="result-label"></span>
+        <span class="risk-badge" id="risk-badge"></span>
+      </div>
+      <div class="prob-row">
+        <div class="prob-track">
+          <div class="prob-fill" id="prob-fill" style="width:0%"></div>
+        </div>
+        <span class="prob-val" id="prob-val">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Batch Prediction -->
+  <div class="section-card">
+    <div class="section-title">Batch prediction</div>
+
+    <div class="batch-row">
+      <label class="file-label" for="batch-file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+             stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <span id="file-name">Choose .csv or .xlsx file…</span>
+      </label>
+      <input type="file" id="batch-file" accept=".csv,.xlsx" onchange="fileSelected(this)">
+      <button class="upload-btn" id="upload-btn" disabled onclick="submitBatch()">Upload &amp; predict</button>
+    </div>
+
+    <button class="template-link" onclick="downloadTemplate()">Download Excel template</button>
+  </div>
+
+</div>
+
+<script>
+  const RANGES = {
+    air_temp:     [290, 305],
+    process_temp: [305, 315],
+    rot_speed:    [1168, 2886],
+    torque:       [3.8, 76.6],
+    tool_wear:    [0, 253],
+  };
+
+  const UNITS = {
+    air_temp: 'K', process_temp: 'K',
+    rot_speed: 'rpm', torque: 'Nm', tool_wear: 'min',
+  };
+
+  const fields = Object.keys(RANGES);
+
+  fields.forEach(id => {
+    const el   = document.getElementById(id);
+    const hint = document.getElementById('hint-' + id);
+    const [lo, hi] = RANGES[id];
+    el.addEventListener('input', () => {
+      const v = parseFloat(el.value);
+      if (el.value && (isNaN(v) || v < lo || v > hi)) {
+        el.classList.add('invalid');
+        hint.classList.add('warn');
+        hint.textContent = `Out of range — expected ${lo}–${hi}`;
+      } else {
+        el.classList.remove('invalid');
+        hint.classList.remove('warn');
+        hint.textContent = `${lo} – ${hi} ${UNITS[id]}`;
+      }
+    });
+  });
+
+  function showError(msg) {
+    const e = document.getElementById('form-error');
+    e.textContent = msg;
+    e.classList.add('show');
+  }
+
+  function clearError() {
+    document.getElementById('form-error').classList.remove('show');
+  }
+
+  function submitPrediction() {
+    clearError();
+    const vals = {};
+    for (const id of fields) {
+      const v = parseFloat(document.getElementById(id).value);
+      const [lo, hi] = RANGES[id];
+      if (isNaN(v)) {
+        showError(`Please fill in "${id.replace(/_/g, ' ')}".`);
+        return;
+      }
+      if (v < lo || v > hi) {
+        showError(`"${id.replace(/_/g, ' ')}" must be between ${lo} and ${hi}.`);
+        return;
+      }
+      vals[id] = v;
+    }
+
+    fetch('/api/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(vals),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        showError(Array.isArray(data.error) ? data.error.join(' | ') : data.error);
+        return;
+      }
+      showResult(data);
+    })
+    .catch(() => showError('Could not reach the server. Make sure the Flask app is running.'));
+  }
+
+  function showResult(data) {
+    const pct   = Math.round(data.failure_probability * 100);
+    const level = data.risk_level.toLowerCase();
+    const cls   = level === 'low' ? 'low' : level === 'medium' ? 'med' : 'high';
+
+    document.getElementById('result-label').textContent = data.prediction;
+    document.getElementById('prob-val').textContent     = pct + '%';
+
+    const fill = document.getElementById('prob-fill');
+    fill.style.width = pct + '%';
+    fill.className   = 'prob-fill fill-' + cls;
+
+    const badge = document.getElementById('risk-badge');
+    badge.textContent = data.risk_level + ' risk';
+    badge.className   = 'risk-badge risk-' + cls;
+
+    document.getElementById('result-box').classList.add('show');
+  }
+
+  function fileSelected(input) {
+    const name = input.files[0]?.name;
+    const span = document.getElementById('file-name');
+    span.textContent = name || 'Choose .csv or .xlsx file…';
+    span.classList.toggle('selected', !!name);
+    document.getElementById('upload-btn').disabled = !name;
+  }
+
+  function submitBatch() {
+    const file = document.getElementById('batch-file').files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append('file', file);
+    fetch('/predict_batch', { method: 'POST', body: form })
+      .then(r => {
+        if (!r.ok) return r.text().then(t => alert(t));
+        return r.blob().then(b => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(b);
+          a.download = 'batch_predictions.csv';
+          a.click();
+        });
+      })
+      .catch(() => alert('Upload failed. Is the Flask server running?'));
+  }
+
+  function downloadTemplate() {
+    window.location.href = '/download_template';
+  }
+</script>
+
+</body>
+</html>
