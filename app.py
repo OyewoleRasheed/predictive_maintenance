@@ -88,13 +88,16 @@ Be specific, practical and concise. No jargon beyond standard engineering terms.
 """
     try:
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=200,
         )
         return response.choices[0].message.content.strip()
-    except Exception:
-        return "AI explanation unavailable at this time."
+    # except Exception:
+    #     return "AI explanation unavailable at this time."
+    except Exception as e:
+        print(f"Groq error: {e}")
+        return f"Debug: {str(e)}"
 
 
 # ---------------- HOME ----------------
