@@ -93,11 +93,11 @@ Be specific, practical and concise. No jargon beyond standard engineering terms.
             max_tokens=200,
         )
         return response.choices[0].message.content.strip()
-    # except Exception:
-    #     return "AI explanation unavailable at this time."
-    except Exception as e:
-        print(f"Groq error: {e}")
-        return f"Debug: {str(e)}"
+    except Exception:
+        return "AI explanation unavailable at this time."
+    # except Exception as e:
+    #     print(f"Groq error: {e}")
+    #     return f"Debug: {str(e)}"
 
 
 # ---------------- HOME ----------------
