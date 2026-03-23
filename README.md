@@ -69,15 +69,6 @@ Random Forest classifier with `class_weight='balanced'` to handle the severe cla
 | Tool wear | minutes | 0 – 253 |
 
 All inputs are validated server-side before reaching the model. Out-of-range values are rejected with a specific error message.
-
-**Model performance** (stratified 80/20 split):
-
-| Metric | No Failure | Failure |
-|---|---|---|
-| Precision | 0.99 | 0.79 |
-| Recall | 0.99 | 0.82 |
-| F1-score | 0.99 | 0.80 |
-
 ---
 
 ## The LLM Layer
