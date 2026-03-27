@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import joblib
 
 #load dataset
@@ -37,11 +37,12 @@ feature_importance_df = pd.DataFrame({
 print(feature_importance_df)
 
 
-plt.figure(figsize=(10,6))
-plt.barh(feature_importance_df['Feature'], feature_importance_df['Importance'], color='skyblue')
-plt.xlabel('Importance')
-plt.title('Feature Importance for Machine Failure Prediction')
-plt.gca().invert_yaxis()  # Highest importance on top
-plt.show()
+# plt.figure(figsize=(10,6))
+# plt.barh(feature_importance_df['Feature'], feature_importance_df['Importance'], color='skyblue')
+# plt.xlabel('Importance')
+# plt.title('Feature Importance for Machine Failure Prediction')
+# plt.gca().invert_yaxis()  # Highest importance on top
+# plt.show()
 
-joblib.dump(model, 'machine_failure_model.pkl')
+# joblib.dump(model, 'machine_failure_model.pkl')
+
